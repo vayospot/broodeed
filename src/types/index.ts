@@ -1,5 +1,5 @@
 // Flock types
-export type FlockType = 'broiler' | 'layer' | 'dual';
+export type FlockType = "broiler" | "layer" | "dual";
 
 export interface Flock {
   id: string;
@@ -9,7 +9,7 @@ export interface Flock {
   startDate: string; // ISO date string
   initialCount: number;
   costPerBird: number;
-  status: 'active' | 'completed' | 'archived';
+  status: "active" | "completed" | "archived";
   notes?: string;
   createdAt: string;
   updatedAt: string;
@@ -32,7 +32,12 @@ export interface DailyLog {
 }
 
 // Expense types
-export type ExpenseCategory = 'feed' | 'medicine' | 'labor' | 'utilities' | 'other';
+export type ExpenseCategory =
+  | "feed"
+  | "medicine"
+  | "labor"
+  | "utilities"
+  | "other";
 
 export interface Expense {
   id: string;
@@ -46,7 +51,7 @@ export interface Expense {
 }
 
 // Sale types
-export type SaleType = 'eggs' | 'birds' | 'manure' | 'other';
+export type SaleType = "eggs" | "birds" | "manure" | "other";
 
 export interface Sale {
   id: string;
@@ -65,15 +70,15 @@ export interface Sale {
 export interface Settings {
   farmName: string;
   currency: string;
-  weightUnit: 'kg' | 'lb';
+  weightUnit: "kg" | "lb";
   isPremium: boolean;
-  premiumType?: 'one_time' | 'monthly';
+  premiumType?: "one_time" | "monthly";
   hasCompletedOnboarding: boolean;
 }
 
 // Premium status
 export interface PremiumStatus {
   isPremium: boolean;
-  premiumType?: 'one_time' | 'monthly';
+  premiumType?: "one_time" | "monthly";
   expiresAt?: string;
 }

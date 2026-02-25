@@ -1,16 +1,16 @@
-import { createMMKV } from 'react-native-mmkv';
+import { createMMKV } from "react-native-mmkv";
 
 // Create MMKV instance for Broodeed app
-export const storage = createMMKV({ id: 'broodeed-storage' });
+export const storage = createMMKV({ id: "broodeed-storage" });
 
 // Storage keys
 export const STORAGE_KEYS = {
-  FLOCKS: 'broodeed_flocks',
-  DAILY_LOGS: 'broodeed_logs',
-  EXPENSES: 'broodeed_expenses',
-  SALES: 'broodeed_sales',
-  SETTINGS: 'broodeed_settings',
-  PREMIUM: 'broodeed_premium',
+  FLOCKS: "broodeed_flocks",
+  DAILY_LOGS: "broodeed_logs",
+  EXPENSES: "broodeed_expenses",
+  SALES: "broodeed_sales",
+  SETTINGS: "broodeed_settings",
+  PREMIUM: "broodeed_premium",
 } as const;
 
 // Helper functions for JSON storage
