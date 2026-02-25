@@ -39,3 +39,8 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# reference only, not needed in repo
+.clinerules/
+.docs/
+memory-bank/
