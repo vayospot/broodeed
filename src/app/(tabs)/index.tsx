@@ -1,16 +1,16 @@
+import Text from "@/components/Text";
 import Colors from "@/constants/Colors";
+import tw from "@/lib/tailwind";
 import { useAppStore } from "@/stores/useAppStore";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import {
   ScrollView,
-  Text,
   TouchableOpacity,
   useColorScheme,
   View,
 } from "react-native";
-import tw from "twrnc";
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();

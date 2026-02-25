@@ -11,6 +11,7 @@ export const STORAGE_KEYS = {
   SALES: "broodeed_sales",
   SETTINGS: "broodeed_settings",
   PREMIUM: "broodeed_premium",
+  ONBOARDING_COMPLETE: "broodeed_onboarding_complete",
 } as const;
 
 // Helper functions for JSON storage

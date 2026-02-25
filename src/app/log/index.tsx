@@ -1,19 +1,20 @@
+import Text from "@/components/Text";
+import TextInput from "@/components/TextInput";
 import Colors from "@/constants/Colors";
+import tw from "@/lib/tailwind";
 import { useAppStore } from "@/stores/useAppStore";
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Alert,
   Dimensions,
   ScrollView,
-  Text,
-  TextInput,
   TouchableOpacity,
   useColorScheme,
   View,
 } from "react-native";
-import tw from "twrnc";
 
 const { width } = Dimensions.get("window");
 
@@ -22,8 +23,13 @@ export default function LogScreen() {
   const colors = Colors[colorScheme ?? "dark"];
   const router = useRouter();
 
-  const { getActiveFlocks, addDailyLog, getDailyLog, updateDailyLog } =
-    useAppStore();
+  const {
+    getActiveFlocks,
+    addDailyLog,
+    getDailyLog,
+    updateDailyLog,
+    getFlockLogs,
+  } = useAppStore();
   const activeFlocks = getActiveFlocks();
 
   const [selectedFlockId, setSelectedFlockId] = useState<string | null>(null);
@@ -32,7 +38,18 @@ export default function LogScreen() {
 
   const today = new Date().toISOString().split("T")[0];
 
-  const [formData, setFormData] = useState({
+  // Get yesterday's date
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = yesterday.toISOString().split("T")[0];
+
+  const [formData, setFormData] = useState<{
+    deaths: number;
+    feedConsumedKg: string;
+    eggsCollected: number;
+    eggsDamaged: number;
+    birdCount: number;
+  }>({
     deaths: 0,
     feedConsumedKg: "",
     eggsCollected: 0,
@@ -45,16 +62,69 @@ export default function LogScreen() {
     ? getDailyLog(selectedFlockId, today)
     : null;
 
+  // Get yesterday's log for pre-fill and context
+  const yesterdayLog = selectedFlockId
+    ? getDailyLog(selectedFlockId, yesterdayStr)
+    : null;
+
+  // Calculate pre-filled bird count: yesterday's count - today's deaths
+  const preFilledBirdCount = existingLog
+    ? existingLog.birdCount
+    : yesterdayLog
+      ? yesterdayLog.birdCount
+      : selectedFlock?.initialCount || 0;
+
+  // Calculate pre-filled feed (average of last 7 days)
+  const getAverageFeed = () => {
+    if (!selectedFlockId) return 0;
+    const logs = getFlockLogs(selectedFlockId).slice(0, 7);
+    if (logs.length === 0) return 0;
+    const total = logs.reduce((sum, log) => sum + (log.feedConsumedKg || 0), 0);
+    return Math.round(total / logs.length);
+  };
+
+  const averageFeed = getAverageFeed();
+
+  // Initialize form with existing log data or pre-filled values
+  useEffect(() => {
+    if (selectedFlockId) {
+      if (existingLog) {
+        // Editing existing log - pre-fill with existing values
+        setFormData({
+          deaths: existingLog.deaths,
+          feedConsumedKg: existingLog.feedConsumedKg?.toString() || "",
+          eggsCollected: existingLog.eggsCollected || 0,
+          eggsDamaged: existingLog.eggsDamaged || 0,
+          birdCount: existingLog.birdCount,
+        });
+      } else {
+        // New log - pre-fill with calculated values
+        setFormData({
+          deaths: 0,
+          feedConsumedKg: "",
+          eggsCollected: 0,
+          eggsDamaged: 0,
+          birdCount: preFilledBirdCount,
+        });
+      }
+    }
+  }, [selectedFlockId, existingLog, preFilledBirdCount]);
+
   const steps = [
     { title: "Mortality", subtitle: "Birds that died today", icon: "warning" },
     { title: "Feed", subtitle: "Feed used (kg)", icon: "leaf" },
     ...(selectedFlock?.type === "layer"
       ? [{ title: "Eggs", subtitle: "Eggs collected", icon: "egg" }]
       : []),
-    { title: "Bird Count", subtitle: "Total birds alive", icon: "people" },
+    {
+      title: "Confirm",
+      subtitle: "Review today's log",
+      icon: "checkmark-circle",
+    },
   ];
 
   const handleNext = () => {
+    Haptics.selectionAsync();
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
       scrollRef.current?.scrollTo({
@@ -65,6 +135,7 @@ export default function LogScreen() {
   };
 
   const handlePrev = () => {
+    Haptics.selectionAsync();
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
       scrollRef.current?.scrollTo({
@@ -83,7 +154,7 @@ export default function LogScreen() {
     const data = {
       flockId: selectedFlockId,
       logDate: today,
-      birdCount: formData.birdCount - formData.deaths,
+      birdCount: formData.birdCount,
       deaths: formData.deaths,
       feedConsumedKg: parseFloat(formData.feedConsumedKg) || 0,
       eggsCollected:
@@ -98,7 +169,10 @@ export default function LogScreen() {
       addDailyLog(data);
     }
 
-    Alert.alert("Success", "Daily log saved!", [
+    // Success haptic
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+    Alert.alert("✅ Log Saved!", `${selectedFlock?.name} has been logged.`, [
       { text: "OK", onPress: () => router.back() },
     ]);
   };
@@ -251,12 +325,13 @@ export default function LogScreen() {
                 tw`w-20 h-20 rounded-2xl items-center justify-center`,
                 { backgroundColor: colors.surface },
               ]}
-              onPress={() =>
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 setFormData({
                   ...formData,
                   deaths: Math.max(0, formData.deaths - 1),
-                })
-              }
+                });
+              }}
             >
               <Ionicons name="remove" size={32} color={colors.text} />
             </TouchableOpacity>
@@ -273,9 +348,10 @@ export default function LogScreen() {
                 tw`w-20 h-20 rounded-2xl items-center justify-center`,
                 { backgroundColor: colors.surface },
               ]}
-              onPress={() =>
-                setFormData({ ...formData, deaths: formData.deaths + 1 })
-              }
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                setFormData({ ...formData, deaths: formData.deaths + 1 });
+              }}
             >
               <Ionicons name="add" size={32} color={colors.text} />
             </TouchableOpacity>

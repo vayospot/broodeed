@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "broodeed",
+    "name": "Broodeed",
     "slug": "broodeed",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./src/assets/images/icon.png",
     "scheme": "broodeed",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
       "image": "./src/assets/images/splash-icon.png",
@@ -15,7 +15,8 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.broodeed"
+      "bundleIdentifier": "com.anonymous.broodeed",
+      "fonts": ["./src/assets/fonts/Inter-Variable.ttf"]
     },
     "android": {
       "adaptiveIcon": {
@@ -32,7 +33,13 @@
       "favicon": "./src/assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-font",
+        {
+          "fonts": ["./src/assets/fonts/Inter-Variable.ttf"]
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

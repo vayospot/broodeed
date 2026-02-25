@@ -1,4 +1,7 @@
+import Text from "@/components/Text";
+import TextInput from "@/components/TextInput";
 import Colors from "@/constants/Colors";
+import tw from "@/lib/tailwind";
 import { useAppStore } from "@/stores/useAppStore";
 import type { FlockType } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
@@ -8,13 +11,10 @@ import {
   Alert,
   Modal,
   ScrollView,
-  Text,
-  TextInput,
   TouchableOpacity,
   useColorScheme,
   View,
 } from "react-native";
-import tw from "twrnc";
 
 export default function FlocksScreen() {
   const colorScheme = useColorScheme();
