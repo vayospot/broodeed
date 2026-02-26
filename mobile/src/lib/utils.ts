@@ -15,6 +15,6 @@ export const getRelativeTime = (dateStr: string) => {
 };
 
 // Format currency
-export const formatCurrency = (amount: number, symbol = "₦") => {
+export const formatCurrency = (amount: number, symbol = "$") => {
   return `${symbol}${amount.toLocaleString()}`;
 };

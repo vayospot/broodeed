@@ -16,8 +16,8 @@ const generateId = () =>
 // Default settings
 const defaultSettings: Settings = {
   farmName: "",
-  currency: "₦ Naira",
-  currencySymbol: "₦",
+  currency: "$ Dollar",
+  currencySymbol: "$",
   weightUnit: "kg",
   isPremium: false,
   hasCompletedOnboarding: false,
@@ -257,10 +257,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   clearAllData: () => {
-    storageHelpers.set(STORAGE_KEYS.FLOCKS, []);
-    storageHelpers.set(STORAGE_KEYS.DAILY_LOGS, []);
-    storageHelpers.set(STORAGE_KEYS.EXPENSES, []);
-    storageHelpers.set(STORAGE_KEYS.SALES, []);
+    storageHelpers.clearAll();
+    // Reset state to defaults
     set({
       flocks: [],
       dailyLogs: [],

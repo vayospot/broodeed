@@ -37,6 +37,11 @@ export default function SettingsScreen() {
   const handleCurrencyChange = () => {
     Alert.alert("Currency", "Select your currency", [
       {
+        text: "$ Dollar (USD)",
+        onPress: () =>
+          updateSettings({ currency: "$ Dollar", currencySymbol: "$" }),
+      },
+      {
         text: "₦ Naira (NGN)",
         onPress: () =>
           updateSettings({ currency: "₦ Naira", currencySymbol: "₦" }),
@@ -45,11 +50,6 @@ export default function SettingsScreen() {
         text: "KSh Shilling (KES)",
         onPress: () =>
           updateSettings({ currency: "KSh Shilling", currencySymbol: "KSh" }),
-      },
-      {
-        text: "$ Dollar (USD)",
-        onPress: () =>
-          updateSettings({ currency: "$ Dollar", currencySymbol: "$" }),
       },
       { text: "Cancel", style: "cancel" },
     ]);
@@ -159,7 +159,7 @@ export default function SettingsScreen() {
               Currency
             </Text>
             <Text style={[tw`text-sm`, { color: colors.textSecondary }]}>
-              {settings.currency || "₦ Naira"}
+              {settings.currency || "$ Dollar"}
             </Text>
           </View>
           <Ionicons

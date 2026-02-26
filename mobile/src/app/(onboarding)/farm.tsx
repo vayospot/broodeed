@@ -9,7 +9,7 @@ import { TouchableOpacity, View } from "react-native";
 export default function FarmScreen() {
   const router = useRouter();
   const [farmName, setFarmName] = useState("");
-  const [currency, setCurrency] = useState("NGN");
+  const [currency, setCurrency] = useState("USD");
   const [weightUnit, setWeightUnit] = useState("kg");
 
   const handleContinue = () => {
@@ -57,9 +57,7 @@ export default function FarmScreen() {
           <View
             style={tw`h-14 bg-surface/50 rounded-xl px-4 flex-row items-center justify-between opacity-60`}
           >
-            <Text style={tw`text-primary/60 text-lg`}>
-              ₦ NGN - Nigerian Naira
-            </Text>
+            <Text style={tw`text-primary/60 text-lg`}>$ USD - US Dollar</Text>
           </View>
         </View>
 

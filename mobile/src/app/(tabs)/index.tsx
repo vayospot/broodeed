@@ -558,7 +558,7 @@ export default function HomeScreen() {
                   <Text style={[tw`text-xs`, { color: colors.textSecondary }]}>
                     {activity.time}
                     {activity.amount
-                      ? ` • ₦${activity.amount.toLocaleString()}`
+                      ? ` • ${settings.currencySymbol}${activity.amount.toLocaleString()}`
                       : ""}
                   </Text>
                 </View>
