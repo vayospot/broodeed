@@ -83,6 +83,7 @@ export default {
     surfaceElevated: light.bg_elevated,
     primary: light.brand_primary,
     accent: light.brand_amber,
+    amber: light.brand_amber,
     danger: light.danger,
     text: light.text_primary,
     textSecondary: light.text_secondary,
@@ -90,6 +91,7 @@ export default {
     tabIconDefault: light.text_secondary,
     tabIconSelected: light.brand_primary,
     divider: light.divider,
+    border: light.border,
   },
   dark: {
     background: dark.bg_deep,
@@ -97,6 +99,7 @@ export default {
     surfaceElevated: dark.bg_elevated,
     primary: dark.brand_primary,
     accent: dark.brand_amber,
+    amber: dark.brand_amber,
     danger: dark.danger,
     text: dark.text_primary,
     textSecondary: dark.text_secondary,
@@ -104,5 +107,6 @@ export default {
     tabIconDefault: dark.text_secondary,
     tabIconSelected: dark.brand_primary,
     divider: dark.divider,
+    border: dark.border,
   },
 };

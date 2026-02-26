@@ -1,13 +1,13 @@
 import { create } from "zustand";
-import { storage, STORAGE_KEYS, storageHelpers } from "./storage";
 import type {
-  Flock,
   DailyLog,
   Expense,
+  Flock,
+  PremiumStatus,
   Sale,
   Settings,
-  PremiumStatus,
 } from "../types";
+import { STORAGE_KEYS, storageHelpers } from "./storage";
 
 // Generate unique IDs
 const generateId = () =>
@@ -16,10 +16,13 @@ const generateId = () =>
 // Default settings
 const defaultSettings: Settings = {
   farmName: "",
-  currency: "USD",
+  currency: "₦ Naira",
+  currencySymbol: "₦",
   weightUnit: "kg",
   isPremium: false,
   hasCompletedOnboarding: false,
+  hapticEnabled: true,
+  dailyLogReminder: false,
 };
 
 // Default premium status
@@ -64,6 +67,7 @@ interface AppState {
 
   // Actions - Settings
   updateSettings: (updates: Partial<Settings>) => void;
+  clearAllData: () => void;
 
   // Actions - Premium
   setPremium: (status: PremiumStatus) => void;
@@ -72,6 +76,10 @@ interface AppState {
   getActiveFlocks: () => Flock[];
   getFlocksCount: () => number;
   canAddFlock: () => boolean;
+  getFlockMortalityRate: (flockId: string) => number;
+  getFlockFCR: (flockId: string) => number | null;
+  getFlockCurrentCount: (flockId: string) => number;
+  getTodayEggs: (flockId: string) => number;
 
   // Initialize from storage
   initialize: () => void;
@@ -248,6 +256,21 @@ export const useAppStore = create<AppState>((set, get) => ({
     });
   },
 
+  clearAllData: () => {
+    storageHelpers.set(STORAGE_KEYS.FLOCKS, []);
+    storageHelpers.set(STORAGE_KEYS.DAILY_LOGS, []);
+    storageHelpers.set(STORAGE_KEYS.EXPENSES, []);
+    storageHelpers.set(STORAGE_KEYS.SALES, []);
+    set({
+      flocks: [],
+      dailyLogs: [],
+      expenses: [],
+      sales: [],
+      settings: defaultSettings,
+      premium: defaultPremium,
+    });
+  },
+
   // Premium actions
   setPremium: (status) => {
     set((state) => {
@@ -268,6 +291,60 @@ export const useAppStore = create<AppState>((set, get) => ({
     const activeCount = get().getFlocksCount();
     // Free: 5 flocks max, Premium: unlimited
     return isPremium || activeCount < 5;
+  },
+
+  // Calculate mortality rate for a flock
+  getFlockMortalityRate: (flockId) => {
+    const flock = get().flocks.find((f) => f.id === flockId);
+    if (!flock) return 0;
+
+    const logs = get().dailyLogs.filter((log) => log.flockId === flockId);
+    const totalDeaths = logs.reduce((sum, log) => sum + (log.deaths || 0), 0);
+
+    // Mortality rate = total deaths / initial count * 100
+    return (totalDeaths / flock.initialCount) * 100;
+  },
+
+  // Calculate FCR (Feed Conversion Ratio) for a flock
+  getFlockFCR: (flockId) => {
+    const flock = get().flocks.find((f) => f.id === flockId);
+    if (!flock || flock.type !== "broiler") return null;
+
+    const logs = get().dailyLogs.filter((log) => log.flockId === flockId);
+    const totalFeed = logs.reduce(
+      (sum, log) => sum + (log.feedConsumedKg || 0),
+      0,
+    );
+
+    // For now, estimate based on initial count (in real app, track harvested birds)
+    const currentCount = get().getFlockCurrentCount(flockId);
+    const birdsSold = flock.initialCount - currentCount;
+
+    if (birdsSold <= 0) return null;
+
+    // FCR = total feed / (birds * avg weight, assume 2.5kg)
+    const totalWeight = birdsSold * 2.5;
+    return totalFeed / totalWeight;
+  },
+
+  // Get current bird count (initial - deaths)
+  getFlockCurrentCount: (flockId) => {
+    const flock = get().flocks.find((f) => f.id === flockId);
+    if (!flock) return 0;
+
+    const logs = get().dailyLogs.filter((log) => log.flockId === flockId);
+    const totalDeaths = logs.reduce((sum, log) => sum + (log.deaths || 0), 0);
+
+    return Math.max(0, flock.initialCount - totalDeaths);
+  },
+
+  // Get today's eggs for a flock
+  getTodayEggs: (flockId) => {
+    const today = new Date().toISOString().split("T")[0];
+    const log = get().dailyLogs.find(
+      (log) => log.flockId === flockId && log.logDate === today,
+    );
+    return log?.eggsCollected || 0;
   },
 
   // Initialize from storage

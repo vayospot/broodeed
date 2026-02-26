@@ -1,4 +1,4 @@
-import OnboardingProgress from "@/components/OnboardingProgress";
+import Progress from "@/components/Progress";
 import Text from "@/components/Text";
 import tw from "@/lib/tailwind";
 import { useRouter } from "expo-router";
@@ -15,7 +15,7 @@ export default function WelcomeScreen() {
     <View style={tw`flex-1 bg-deep px-6 pt-20 pb-10 justify-between`}>
       {/* Header with dots */}
       <View style={tw`mb-8`}>
-        <OnboardingProgress totalSteps={3} currentStep={0} />
+        <Progress totalSteps={3} currentStep={0} />
       </View>
 
       {/* Main Content */}

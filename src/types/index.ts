@@ -11,6 +11,7 @@ export interface Flock {
   costPerBird: number;
   status: "active" | "completed" | "archived";
   notes?: string;
+  expectedDuration?: number; // days
   createdAt: string;
   updatedAt: string;
 }
@@ -70,10 +71,13 @@ export interface Sale {
 export interface Settings {
   farmName: string;
   currency: string;
+  currencySymbol: string;
   weightUnit: "kg" | "lb";
   isPremium: boolean;
   premiumType?: "one_time" | "monthly";
   hasCompletedOnboarding: boolean;
+  hapticEnabled: boolean;
+  dailyLogReminder: boolean;
 }
 
 // Premium status

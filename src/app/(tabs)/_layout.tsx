@@ -1,6 +1,6 @@
-import { useColorScheme } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
+import { useColorScheme } from "react-native";
 
 import Colors from "@/constants/Colors";
 
@@ -28,6 +28,7 @@ export default function TabLayout() {
         headerStyle: {
           backgroundColor: colors.background,
         },
+        headerTitle: "",
         headerTintColor: colors.text,
         headerShadowVisible: false,
       }}
@@ -35,17 +36,14 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" size={size} color={color} />
           ),
-          headerTitle: "Broodeed",
         }}
       />
       <Tabs.Screen
         name="flocks"
         options={{
-          title: "Flocks",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="egg" size={size} color={color} />
           ),
@@ -54,7 +52,6 @@ export default function TabLayout() {
       <Tabs.Screen
         name="finance"
         options={{
-          title: "Finance",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="wallet" size={size} color={color} />
           ),
@@ -63,7 +60,6 @@ export default function TabLayout() {
       <Tabs.Screen
         name="more"
         options={{
-          title: "More",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="menu" size={size} color={color} />
           ),

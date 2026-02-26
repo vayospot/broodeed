@@ -1,4 +1,4 @@
-import OnboardingProgress from "@/components/OnboardingProgress";
+import Progress from "@/components/Progress";
 import Text from "@/components/Text";
 import TextInput from "@/components/TextInput";
 import tw from "@/lib/tailwind";
@@ -42,7 +42,7 @@ export default function FlockScreen() {
       <View>
         {/* Progress */}
         <View style={tw`mb-8`}>
-          <OnboardingProgress totalSteps={3} currentStep={2} />
+          <Progress totalSteps={3} currentStep={2} />
         </View>
 
         <Text style={tw`text-2xl font-bold text-primary mb-2`}>

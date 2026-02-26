@@ -1,15 +1,12 @@
 import tw from "@/lib/tailwind";
 import { View } from "react-native";
 
-interface OnboardingProgressProps {
+interface ProgressProps {
   totalSteps: number;
   currentStep: number;
 }
 
-export default function OnboardingProgress({
-  totalSteps,
-  currentStep,
-}: OnboardingProgressProps) {
+export default function Progress({ totalSteps, currentStep }: ProgressProps) {
   return (
     <View style={tw`flex-row justify-center gap-2`}>
       {Array.from({ length: totalSteps }).map((_, index) => {
