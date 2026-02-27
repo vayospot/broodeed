@@ -3,7 +3,7 @@ import type { PremiumStatus } from "../types";
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
-export type PlanType = "one_time" | "monthly";
+export type PlanType = "monthly";
 
 export interface CreateCheckoutParams {
   planType: PlanType;

@@ -56,8 +56,8 @@ app.post("/api/checkout", async (c) => {
     );
   }
 
-  if (body.planType !== "one_time" && body.planType !== "monthly") {
-    return c.json({ error: 'planType must be "one_time" or "monthly"' }, 400);
+  if (body.planType !== "monthly") {
+    return c.json({ error: 'planType must be "monthly"' }, 400);
   }
 
   const workerUrl = new URL(c.req.url).origin;
@@ -158,14 +158,6 @@ async function processWebhookEvent(rawBody: string): Promise<void> {
   });
 
   switch (payload.eventType) {
-    case "checkout.completed":
-      // One-time payment succeeded.
-      console.log(`[webhook] ✅ One-time purchase completed!`);
-      console.log(`Customer: ${payload.object.customer.email}`);
-      console.log(`Plan: ${payload.object.metadata?.planType}`);
-      console.log(`Device: ${payload.object.metadata?.deviceId}`);
-      break;
-
     case "subscription.paid":
       // Recurring subscription payment succeeded.
       console.log(`[webhook] ✅ Subscription payment received!`);
@@ -213,10 +205,7 @@ app.get("/api/verify-premium", async (c) => {
     const response: VerifyPremiumResponse = {
       premium: paid,
       ...(paid && {
-        planType: checkout.metadata?.planType as
-          | "one_time"
-          | "monthly"
-          | undefined,
+        planType: checkout.metadata?.planType as "monthly" | undefined,
         email: checkout.customer?.email,
         checkoutId: checkout.id,
       }),

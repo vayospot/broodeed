@@ -20,7 +20,7 @@ export interface Flock {
 export interface DailyLog {
   id: string;
   flockId: string;
-  logDate: string; // ISO date (unique per flock per day)
+  logDate: string; // ISO date string (unique per flock per day)
   birdCount: number; // end of day count
   deaths: number;
   feedConsumedKg: number;
@@ -74,7 +74,7 @@ export interface Settings {
   currencySymbol: string;
   weightUnit: "kg" | "lb";
   isPremium: boolean;
-  premiumType?: "one_time" | "monthly";
+  premiumType?: "monthly";
   hasCompletedOnboarding: boolean;
   hapticEnabled: boolean;
   dailyLogReminder: boolean;
@@ -83,7 +83,7 @@ export interface Settings {
 // Premium status
 export interface PremiumStatus {
   isPremium: boolean;
-  premiumType?: "one_time" | "monthly";
+  premiumType?: "monthly";
   email?: string;
   checkoutId?: string;
   expiresAt?: string;

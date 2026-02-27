@@ -2,7 +2,6 @@ export interface Env {
   ENVIRONMENT: string;
   CREEM_API_KEY: string;
   CREEM_WEBHOOK_SECRET: string;
-  CREEM_PRODUCT_LIFETIME: string;
   CREEM_PRODUCT_MONTHLY: string;
 }
 
@@ -63,7 +62,7 @@ export interface CreemWebhookPayload {
 
 // ─── Internal App Types
 
-export type PlanType = "one_time" | "monthly";
+export type PlanType = "monthly";
 
 export interface CheckoutRequestBody {
   planType: PlanType;

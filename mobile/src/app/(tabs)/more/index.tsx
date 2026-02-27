@@ -122,9 +122,7 @@ export default function MoreScreen() {
                 You&apos;re Premium!
               </Text>
               <Text style={[tw`text-sm`, { color: colors.textSecondary }]}>
-                {premium.premiumType === "one_time"
-                  ? "Lifetime access"
-                  : "Monthly subscription"}
+                Monthly subscription
               </Text>
             </View>
           </View>

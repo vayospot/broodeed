@@ -1,6 +1,6 @@
 import Text from "@/components/Text";
 import Colors from "@/constants/Colors";
-import { createCheckout, parseDeepLinkParams, PlanType } from "@/lib/creem";
+import { createCheckout, parseDeepLinkParams } from "@/lib/creem";
 import { getOrCreateDeviceId } from "@/lib/deviceId";
 import tw from "@/lib/tailwind";
 import { storage } from "@/stores/storage";
@@ -28,12 +28,9 @@ import Animated, {
 import type { WebViewNavigation } from "react-native-webview";
 import { WebView } from "react-native-webview";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// ─── Types
 
 type CheckoutMethod = "browser" | "webview";
-
-const PLAN_ONE_TIME: PlanType = "one_time";
-const PLAN_MONTHLY: PlanType = "monthly";
 
 export default function PremiumScreen() {
   const colorScheme = useColorScheme();
@@ -41,7 +38,6 @@ export default function PremiumScreen() {
   const router = useRouter();
   const webViewRef = useRef<WebView>(null);
 
-  const [selectedPlan, setSelectedPlan] = useState<PlanType>(PLAN_ONE_TIME);
   const [checkoutMethod, setCheckoutMethod] =
     useState<CheckoutMethod>("browser");
   const [isLoading, setIsLoading] = useState(false);
@@ -51,8 +47,6 @@ export default function PremiumScreen() {
 
   // Animations
   const crownFloat = useSharedValue(0);
-  const oneTimeScale = useSharedValue(1);
-  const monthlyScale = useSharedValue(1);
   const webViewSlide = useSharedValue(1000);
 
   useEffect(() => {
@@ -67,30 +61,11 @@ export default function PremiumScreen() {
     transform: [{ translateY: crownFloat.value }],
   }));
 
-  const oneTimeAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: oneTimeScale.value }],
-  }));
-
-  const monthlyAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: monthlyScale.value }],
-  }));
-
   const webViewAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: webViewSlide.value }],
   }));
 
   // Handlers
-
-  const handleSelectPlan = (plan: PlanType) => {
-    setSelectedPlan(plan);
-    if (plan === PLAN_ONE_TIME) {
-      oneTimeScale.value = withSpring(1.04, { damping: 15 });
-      monthlyScale.value = withSpring(1, { damping: 15 });
-    } else {
-      monthlyScale.value = withSpring(1.04, { damping: 15 });
-      oneTimeScale.value = withSpring(1, { damping: 15 });
-    }
-  };
 
   const handleClose = () => router.back();
 
@@ -104,7 +79,7 @@ export default function PremiumScreen() {
       const deviceId = getOrCreateDeviceId();
 
       const { checkoutUrl, checkoutId } = await createCheckout({
-        planType: selectedPlan,
+        planType: "monthly",
         deviceId,
       });
 
@@ -348,100 +323,41 @@ export default function PremiumScreen() {
           </Text>
         </View>
 
-        {/* Plan Selection  */}
-
-        <Text style={[tw`text-lg font-semibold mb-4`, { color: colors.text }]}>
-          Choose Your Plan:
-        </Text>
-
-        {/* One-Time */}
-        <Animated.View style={[tw`mb-4`, oneTimeAnimatedStyle]}>
-          <TouchableOpacity
-            style={[
-              tw`p-4 rounded-xl border-2`,
-              {
-                backgroundColor: colors.surface,
-                borderColor:
-                  selectedPlan === PLAN_ONE_TIME
-                    ? colors.accent
-                    : colors.border,
-              },
-            ]}
-            onPress={() => handleSelectPlan(PLAN_ONE_TIME)}
-          >
-            <View style={tw`flex-row items-center justify-between`}>
-              <View>
-                <Text style={[tw`text-lg font-bold`, { color: colors.text }]}>
-                  One-Time
-                </Text>
-                <Text style={[tw`text-sm`, { color: colors.textSecondary }]}>
-                  Pay once, yours forever
-                </Text>
-              </View>
-              <View style={tw`flex-row items-center`}>
-                {selectedPlan === PLAN_ONE_TIME && (
-                  <Ionicons
-                    name="checkmark-circle"
-                    size={24}
-                    color={colors.accent}
-                    style={tw`mr-2`}
-                  />
-                )}
-                <Text
-                  style={[tw`text-2xl font-bold`, { color: colors.accent }]}
-                >
-                  $9.99
-                </Text>
-              </View>
+        {/* Plan Display */}
+        <View
+          style={[
+            tw`p-4 rounded-xl border-2 mb-8`,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.accent,
+            },
+          ]}
+        >
+          <View style={tw`flex-row items-center justify-between`}>
+            <View>
+              <Text style={[tw`text-lg font-bold`, { color: colors.text }]}>
+                Monthly Subscription
+              </Text>
+              <Text style={[tw`text-sm`, { color: colors.textSecondary }]}>
+                Cancel anytime
+              </Text>
             </View>
-          </TouchableOpacity>
-        </Animated.View>
-
-        {/* Monthly */}
-        <Animated.View style={[tw`mb-8`, monthlyAnimatedStyle]}>
-          <TouchableOpacity
-            style={[
-              tw`p-4 rounded-xl border-2`,
-              {
-                backgroundColor: colors.surface,
-                borderColor:
-                  selectedPlan === PLAN_MONTHLY ? colors.accent : colors.border,
-              },
-            ]}
-            onPress={() => handleSelectPlan(PLAN_MONTHLY)}
-          >
-            <View style={tw`flex-row items-center justify-between`}>
-              <View>
-                <Text style={[tw`text-lg font-bold`, { color: colors.text }]}>
-                  Monthly Subscription
-                </Text>
-                <Text style={[tw`text-sm`, { color: colors.textSecondary }]}>
-                  Cancel anytime
-                </Text>
-              </View>
-              <View style={tw`flex-row items-center`}>
-                {selectedPlan === PLAN_MONTHLY && (
-                  <Ionicons
-                    name="checkmark-circle"
-                    size={24}
-                    color={colors.accent}
-                    style={tw`mr-2`}
-                  />
-                )}
-                <Text
-                  style={[tw`text-2xl font-bold`, { color: colors.accent }]}
-                >
-                  $1
-                </Text>
-                <Text
-                  style={[tw`text-sm ml-1`, { color: colors.textSecondary }]}
-                >
-                  /mo
-                </Text>
-              </View>
+            <View style={tw`flex-row items-center`}>
+              <Ionicons
+                name="checkmark-circle"
+                size={24}
+                color={colors.accent}
+                style={tw`mr-2`}
+              />
+              <Text style={[tw`text-2xl font-bold`, { color: colors.accent }]}>
+                $1
+              </Text>
+              <Text style={[tw`text-sm ml-1`, { color: colors.textSecondary }]}>
+                /mo
+              </Text>
             </View>
-          </TouchableOpacity>
-        </Animated.View>
+          </View>
+        </View>
 
         {/* CTA */}
         <TouchableOpacity
@@ -469,9 +385,7 @@ export default function PremiumScreen() {
             </>
           ) : (
             <Text style={[tw`text-lg font-bold`, { color: colors.background }]}>
-              {selectedPlan === PLAN_ONE_TIME
-                ? "🔓  Unlock Premium — $9.99"
-                : "🔓  Start Subscription — $1/mo"}
+              Start Subscription — $1/mo
             </Text>
           )}
         </TouchableOpacity>

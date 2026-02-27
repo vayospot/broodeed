@@ -41,10 +41,7 @@ export async function createCheckoutSession(
 ): Promise<CreemCheckoutResponse> {
   const baseUrl = getCreemBaseUrl(env);
 
-  const productId =
-    body.planType === "one_time"
-      ? env.CREEM_PRODUCT_LIFETIME
-      : env.CREEM_PRODUCT_MONTHLY;
+  const productId = env.CREEM_PRODUCT_MONTHLY;
 
   // The success_url is our own backend endpoint.
   // CREEM will append its own query params to this URL after payment:
