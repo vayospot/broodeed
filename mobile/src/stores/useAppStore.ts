@@ -356,9 +356,14 @@ export const useAppStore = create<AppState>((set, get) => ({
     const settings =
       storageHelpers.getString<Settings>(STORAGE_KEYS.SETTINGS) ||
       defaultSettings;
-    const premium =
-      storageHelpers.getString<PremiumStatus>(STORAGE_KEYS.PREMIUM) ||
-      defaultPremium;
+
+    // Always reset premium and deviceId on app launch for testing
+    // This allows easy re-testing of the checkout flow
+    storageHelpers.removeMultiple([
+      STORAGE_KEYS.PREMIUM,
+      STORAGE_KEYS.DEVICE_ID,
+    ]);
+    const premium = defaultPremium;
 
     set({ flocks, dailyLogs, expenses, sales, settings, premium });
   },

@@ -80,7 +80,7 @@ export async function getCheckoutById(
   const baseUrl = getCreemBaseUrl(env);
 
   return creemFetch<CreemCheckoutGetResponse>(
-    `${baseUrl}/v1/checkouts/${checkoutId}`,
+    `${baseUrl}/v1/checkouts?checkout_id=${checkoutId}`,
     env.CREEM_API_KEY,
   );
 }

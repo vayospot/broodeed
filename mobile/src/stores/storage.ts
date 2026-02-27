@@ -12,6 +12,7 @@ export const STORAGE_KEYS = {
   SETTINGS: "broodeed_settings",
   PREMIUM: "broodeed_premium",
   ONBOARDING_COMPLETE: "broodeed_onboarding_complete",
+  DEVICE_ID: "broodeed_device_id",
 } as const;
 
 // Helper functions for JSON storage
@@ -32,6 +33,10 @@ export const storageHelpers = {
 
   remove: (key: string): void => {
     storage.remove(key);
+  },
+
+  removeMultiple: (keys: string[]): void => {
+    keys.forEach((key) => storage.remove(key));
   },
 
   clearAll: (): void => {

@@ -607,7 +607,7 @@ export default function HomeScreen() {
               onPress={() => router.push("/more")}
             >
               <Text style={[tw`font-semibold text-sm`, { color: colors.text }]}>
-                $4.99
+                $9.99
               </Text>
             </TouchableOpacity>
           </View>

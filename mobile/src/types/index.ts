@@ -84,5 +84,7 @@ export interface Settings {
 export interface PremiumStatus {
   isPremium: boolean;
   premiumType?: "one_time" | "monthly";
+  email?: string;
+  checkoutId?: string;
   expiresAt?: string;
 }

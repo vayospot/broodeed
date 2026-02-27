@@ -7,6 +7,9 @@
     "mobile",
     "backend"
   ],
+  "overrides": {
+    "@types/react": "~19.1.0"
+  },
   "scripts": {
     "mobile": "npm start --workspace=mobile",
     "backend": "npm run dev --workspace=backend",

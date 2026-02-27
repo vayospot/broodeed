@@ -1,3 +1,4 @@
+import { parseDeepLinkParams } from "@/lib/creem";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   DarkTheme,
@@ -5,7 +6,8 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import * as Linking from "expo-linking";
+import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { useColorScheme } from "react-native";
@@ -31,21 +33,39 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
-  if (!loaded) {
-    return null;
-  }
+  if (!loaded) return null;
 
   return <RootLayoutNav />;
 }
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
+  const router = useRouter();
+
+  useEffect(() => {
+    const handleDeepLink = (event: { url: string }) => {
+      const params = parseDeepLinkParams(event.url);
+
+      if (!event.url.includes("payment/success")) return;
+
+      const checkoutId = params.checkoutId ?? "";
+      const orderId = params.orderId ?? "";
+
+      console.log("[Deep Link] Payment URL received:", { checkoutId, orderId });
+
+      router.replace(
+        `/(tabs)/more/premium/success?checkoutId=${checkoutId}&orderId=${orderId}&method=deeplink`,
+      );
+    };
+
+    const subscription = Linking.addEventListener("url", handleDeepLink);
+    return () => subscription.remove();
+  }, [router]);
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
-
         <Stack.Screen
           name="(onboarding)"
           options={{
