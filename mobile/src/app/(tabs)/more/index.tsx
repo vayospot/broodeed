@@ -59,20 +59,11 @@ export default function MoreScreen() {
   const premiumFeatures = [
     "Unlimited flocks",
     "CSV export for records",
-    "Priority support",
     "No ads (future)",
   ];
 
   return (
-    <ScrollView
-      style={[tw`flex-1`, { backgroundColor: colors.background }]}
-      contentContainerStyle={tw`p-4`}
-    >
-      {/* Header */}
-      <Text style={[tw`text-2xl font-bold mb-6`, { color: colors.text }]}>
-        More
-      </Text>
-
+    <ScrollView style={tw`flex-1`} contentContainerStyle={tw`p-4 pt-12`}>
       {/* Farm Identity Card */}
       <View
         style={[tw`rounded-xl p-4 mb-6`, { backgroundColor: colors.surface }]}
@@ -128,20 +119,26 @@ export default function MoreScreen() {
           </View>
         </View>
       ) : (
-        <TouchableOpacity
+        <View
           style={[tw`rounded-xl p-4 mb-6`, { backgroundColor: colors.surface }]}
-          onPress={handleGoPremium}
         >
-          <View style={tw`flex-row items-center mb-3`}>
-            <Ionicons name="diamond" size={24} color={colors.accent} />
-            <Text style={[tw`font-bold ml-2 flex-1`, { color: colors.text }]}>
-              Go Premium
-            </Text>
-            <Ionicons
-              name="chevron-forward"
-              size={20}
-              color={colors.textSecondary}
-            />
+          <View style={tw`flex-row items-center justify-between mb-3`}>
+            <View style={tw`flex-row items-center`}>
+              <Ionicons name="diamond" size={24} color={colors.accent} />
+              <Text style={[tw`font-bold ml-2`, { color: colors.text }]}>
+                Go Premium
+              </Text>
+            </View>
+            <View
+              style={[
+                tw`px-3 py-1 rounded-full`,
+                { backgroundColor: colors.accent + "30" },
+              ]}
+            >
+              <Text style={[tw`font-bold`, { color: colors.accent }]}>
+                $9.99/mo
+              </Text>
+            </View>
           </View>
           {premiumFeatures.map((feature) => (
             <View key={feature} style={tw`flex-row items-center mb-2`}>
@@ -155,7 +152,18 @@ export default function MoreScreen() {
               </Text>
             </View>
           ))}
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              tw`mt-4 p-3 rounded-xl items-center`,
+              { backgroundColor: colors.accent },
+            ]}
+            onPress={handleGoPremium}
+          >
+            <Text style={[tw`font-bold`, { color: colors.text }]}>
+              Upgrade Now
+            </Text>
+          </TouchableOpacity>
+        </View>
       )}
 
       {/* APP Section */}

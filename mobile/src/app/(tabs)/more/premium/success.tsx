@@ -134,7 +134,10 @@ export default function PaymentSuccessScreen() {
     intervalRef.current = setInterval(checkVerification, POLL_INTERVAL_MS);
   };
 
-  const handleContinue = () => router.replace("/(tabs)");
+  const handleContinue = () => {
+    router.dismissAll();
+    router.replace("/(tabs)");
+  };
   const handleGoBack = () => router.back();
 
   if (screenState === "polling") {
@@ -306,14 +309,14 @@ export default function PaymentSuccessScreen() {
               { color: colors.text },
             ]}
           >
-            You&apos;re Premium! 🎉
+            Welcome to Premium
           </Text>
 
           <Text
             style={[tw`text-center mb-8 px-4`, { color: colors.textSecondary }]}
           >
-            Welcome to Broodeed Premium. You now have unlimited flocks and CSV
-            export access.
+            Thank you for upgrading. You now have access to all Premium
+            features.
           </Text>
 
           <View
@@ -325,6 +328,8 @@ export default function PaymentSuccessScreen() {
             {[
               { icon: "layers", label: "Unlimited flocks" },
               { icon: "download", label: "CSV export for records" },
+              { icon: "headset", label: "Priority support" },
+              { icon: "remove-circle-outline", label: "No ads" },
             ].map((feature, index, arr) => (
               <View
                 key={feature.label}

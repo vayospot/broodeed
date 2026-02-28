@@ -53,7 +53,7 @@ export default function FinanceScreen() {
   });
 
   const activeFlocks = getActiveFlocks();
-  const currency = settings.currency || "$";
+  const currencySymbol = settings.currencySymbol || "$";
 
   // Calculate totals
   const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
@@ -158,7 +158,7 @@ export default function FinanceScreen() {
                 Revenue
               </Text>
               <Text style={[tw`text-xl font-bold`, { color: colors.primary }]}>
-                {currency}
+                {currencySymbol}
                 {totalSales.toFixed(2)}
               </Text>
             </View>
@@ -167,7 +167,7 @@ export default function FinanceScreen() {
                 Expenses
               </Text>
               <Text style={[tw`text-xl font-bold`, { color: colors.danger }]}>
-                {currency}
+                {currencySymbol}
                 {totalExpenses.toFixed(2)}
               </Text>
             </View>
@@ -185,7 +185,7 @@ export default function FinanceScreen() {
                 },
               ]}
             >
-              {currency}
+              {currencySymbol}
               {netProfit.toFixed(2)}
             </Text>
           </View>
@@ -311,7 +311,7 @@ export default function FinanceScreen() {
                   </Text>
                 </View>
                 <Text style={[tw`font-bold`, { color: colors.danger }]}>
-                  -{currency}
+                  -{currencySymbol}
                   {expense.amount.toFixed(2)}
                 </Text>
                 <TouchableOpacity
@@ -371,7 +371,7 @@ export default function FinanceScreen() {
                 </Text>
               </View>
               <Text style={[tw`font-bold`, { color: colors.primary }]}>
-                +{currency}
+                +{currencySymbol}
                 {(sale.quantity * sale.unitPrice).toFixed(2)}
               </Text>
               <TouchableOpacity
@@ -452,7 +452,7 @@ export default function FinanceScreen() {
                 <Text
                   style={[tw`text-sm font-medium mb-2`, { color: colors.text }]}
                 >
-                  Amount ({currency})
+                  Amount ({currencySymbol})
                 </Text>
                 <TextInput
                   style={[
@@ -599,7 +599,7 @@ export default function FinanceScreen() {
                 <Text
                   style={[tw`text-sm font-medium mb-2`, { color: colors.text }]}
                 >
-                  Price per unit ({currency})
+                  Price per unit ({currencySymbol})
                 </Text>
                 <TextInput
                   style={[

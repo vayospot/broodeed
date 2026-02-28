@@ -3,19 +3,23 @@ import Colors from "@/constants/Colors";
 import tw from "@/lib/tailwind";
 import { useAppStore } from "@/stores/useAppStore";
 import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
+import { useEffect } from "react";
 import {
   ScrollView,
   TouchableOpacity,
   useColorScheme,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function FlockDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "dark"];
   const router = useRouter();
+  const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
 
   const { getFlock, getFlockLogs, getFlockExpenses, getFlockSales } =
     useAppStore();
@@ -23,6 +27,15 @@ export default function FlockDetailScreen() {
   const logs = getFlockLogs(id);
   const expenses = getFlockExpenses(id);
   const sales = getFlockSales(id);
+
+  // Set header title dynamically
+  useEffect(() => {
+    if (flock) {
+      navigation.setOptions({
+        headerTitle: flock.name,
+      });
+    }
+  }, [flock, navigation]);
 
   if (!flock) {
     return (
@@ -72,20 +85,14 @@ export default function FlockDetailScreen() {
 
   return (
     <View style={[tw`flex-1`, { backgroundColor: colors.background }]}>
-      <ScrollView contentContainerStyle={tw`p-4`}>
-        {/* Header */}
-        <View style={tw`flex-row items-center mb-6`}>
-          <TouchableOpacity onPress={() => router.back()} style={tw`mr-3`}>
-            <Ionicons name="arrow-back" size={24} color={colors.text} />
-          </TouchableOpacity>
-          <View style={tw`flex-1`}>
-            <Text style={[tw`text-2xl font-bold`, { color: colors.text }]}>
-              {flock.name}
-            </Text>
-            <Text style={[tw`text-sm`, { color: colors.textSecondary }]}>
-              {flock.type} • Day {daysOld}
-            </Text>
-          </View>
+      <ScrollView
+        contentContainerStyle={[tw`p-4`, { paddingBottom: insets.bottom + 20 }]}
+      >
+        {/* Subtitle shown below header */}
+        <View style={tw`mb-6`}>
+          <Text style={[tw`text-sm`, { color: colors.textSecondary }]}>
+            {flock.type} • Day {daysOld}
+          </Text>
         </View>
 
         {/* Stats Cards */}

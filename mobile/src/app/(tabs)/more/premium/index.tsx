@@ -22,7 +22,6 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
-  withSpring,
   withTiming,
 } from "react-native-reanimated";
 import type { WebViewNavigation } from "react-native-webview";
@@ -134,7 +133,7 @@ export default function PremiumScreen() {
     setWebViewUrl(checkoutUrl);
     setWebViewLoading(true);
     setWebViewVisible(true);
-    webViewSlide.value = withSpring(0, { damping: 20, stiffness: 200 });
+    webViewSlide.value = withTiming(0, { duration: 300 });
     storage.set("broodeed_last_checkout_id", checkoutId);
   };
 
@@ -184,13 +183,15 @@ export default function PremiumScreen() {
   const premiumFeatures = [
     { icon: "layers", label: "Unlimited flocks" },
     { icon: "download", label: "CSV export for records" },
+    { icon: "headset", label: "Priority support" },
+    { icon: "remove-circle-outline", label: "No ads" },
   ];
 
   return (
     <View style={[tw`flex-1`, { backgroundColor: colors.background }]}>
       {/* Close Button */}
       <TouchableOpacity
-        style={tw`absolute top-12 right-4 z-10 p-2`}
+        style={tw`absolute right-4 z-10 p-2`}
         onPress={handleClose}
         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
       >
@@ -199,7 +200,7 @@ export default function PremiumScreen() {
 
       <ScrollView
         style={tw`flex-1`}
-        contentContainerStyle={tw`p-6 pt-16 pb-12`}
+        contentContainerStyle={tw`p-6 pb-12`}
         showsVerticalScrollIndicator={false}
       >
         {/* Floating Diamond */}
@@ -221,7 +222,7 @@ export default function PremiumScreen() {
             { color: colors.text },
           ]}
         >
-          Broodeed Premium
+          Premium
         </Text>
 
         {/* Subtitle */}
@@ -318,8 +319,8 @@ export default function PremiumScreen() {
         >
           <Text style={[tw`text-xs`, { color: colors.textSecondary }]}>
             {checkoutMethod === "browser"
-              ? "🌐  Opens CREEM checkout in your device's browser (Safari / Chrome). After payment, a deep link brings you back to the app automatically."
-              : "📱  Renders CREEM checkout inside a WebView within the app. You never visually leave Broodeed. The app intercepts the redirect and handles the return."}
+              ? "Opens CREEM checkout in your device browser (Safari / Chrome). After payment, a deep link brings you back to the app automatically."
+              : "Renders CREEM checkout inside a WebView within the app. You never visually leave Broodeed. The app intercepts the redirect and handles the return."}
           </Text>
         </View>
 
@@ -403,7 +404,6 @@ export default function PremiumScreen() {
       </ScrollView>
 
       {/* WebView Overlay */}
-
       {webViewVisible && (
         <Animated.View
           style={[

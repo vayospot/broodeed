@@ -3,10 +3,12 @@ import { Tabs } from "expo-router";
 import { useColorScheme } from "react-native";
 
 import Colors from "@/constants/Colors";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "dark"];
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
@@ -31,11 +33,17 @@ export default function TabLayout() {
         headerTitle: "",
         headerTintColor: colors.text,
         headerShadowVisible: false,
+        headerShown: false,
+        sceneStyle: {
+          backgroundColor: colors.background,
+          paddingTop: insets.top,
+        },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" size={size} color={color} />
           ),

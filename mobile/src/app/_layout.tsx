@@ -69,7 +69,6 @@ function RootLayoutNav() {
         <Stack.Screen
           name="(onboarding)"
           options={{
-            headerShown: false,
             presentation: "fullScreenModal",
             animation: "fade",
           }}

@@ -1,15 +1,16 @@
 import Colors from "@/constants/Colors";
-import { Stack } from "expo-router";
+import { HeaderBackButton } from "@react-navigation/elements";
+import { router, Stack } from "expo-router";
 import { useColorScheme } from "react-native";
 
-export default function MoreLayout() {
+export default function FlockLayout() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "dark"];
 
   return (
     <Stack
       screenOptions={{
-        headerShown: false,
+        headerShown: true,
         headerStyle: {
           backgroundColor: colors.background,
         },
@@ -18,22 +19,20 @@ export default function MoreLayout() {
         headerTitle: "",
         contentStyle: { backgroundColor: colors.background },
         animation: "slide_from_right",
+        headerLeft: () => (
+          <HeaderBackButton
+            tintColor="white"
+            onPress={() => {
+              router.back();
+            }}
+          />
+        ),
       }}
     >
-      <Stack.Screen name="index" />
-      <Stack.Screen name="settings" />
       <Stack.Screen
-        name="premium/index"
+        name="[id]"
         options={{
-          presentation: "modal",
-          animation: "slide_from_bottom",
-        }}
-      />
-      <Stack.Screen
-        name="premium/success"
-        options={{
-          presentation: "modal",
-          animation: "fade",
+          headerTitle: "Flock Details",
         }}
       />
     </Stack>

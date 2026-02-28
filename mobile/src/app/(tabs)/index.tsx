@@ -1,7 +1,6 @@
 import Text from "@/components/Text";
 import Colors from "@/constants/Colors";
 import tw from "@/lib/tailwind";
-import { getRelativeTime } from "@/lib/utils";
 import { useAppStore } from "@/stores/useAppStore";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -42,16 +41,8 @@ export default function HomeScreen() {
     return () => pulse.stop();
   }, [pulseAnim]);
 
-  const {
-    initialize,
-    getActiveFlocks,
-    settings,
-    premium,
-    getDailyLog,
-    getFlocksCount,
-    expenses,
-    sales,
-  } = useAppStore();
+  const { initialize, getActiveFlocks, settings, getDailyLog, getFlocksCount } =
+    useAppStore();
 
   const activeFlocks = getActiveFlocks();
   const flocksCount = getFlocksCount();
@@ -61,12 +52,6 @@ export default function HomeScreen() {
   }, []);
 
   const today = new Date().toISOString().split("T")[0];
-
-  // Check if any flock has been logged today
-  const hasLoggedToday = activeFlocks.some((flock) => {
-    const log = getDailyLog(flock.id, today);
-    return !!log;
-  });
 
   // Calculate status based on spec logic
   const getFarmStatus = () => {
@@ -141,79 +126,6 @@ export default function HomeScreen() {
 
   const todaySummary = getTodaySummary();
 
-  // Get recent activity (last 5 items)
-  const getRecentActivity = () => {
-    const activities: {
-      id: string;
-      type: "log" | "expense" | "sale";
-      icon: string;
-      description: string;
-      time: string;
-      amount?: number;
-    }[] = [];
-
-    // Add daily logs
-    for (const flock of activeFlocks) {
-      const log = getDailyLog(flock.id, today);
-      if (log) {
-        activities.push({
-          id: log.id,
-          type: "log",
-          icon: "checkmark-circle",
-          description: `${flock.name} logged`,
-          time: "Today",
-        });
-      }
-    }
-
-    // Add recent expenses
-    const recentExpenses = expenses
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      )
-      .slice(0, 3);
-    for (const expense of recentExpenses) {
-      activities.push({
-        id: expense.id,
-        type: "expense",
-        icon: "medkit",
-        description: expense.description || expense.category,
-        time: getRelativeTime(expense.createdAt),
-        amount: expense.amount,
-      });
-    }
-
-    // Add recent sales
-    const recentSales = sales
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      )
-      .slice(0, 2);
-    for (const sale of recentSales) {
-      activities.push({
-        id: sale.id,
-        type: "sale",
-        icon: "egg",
-        description: `${sale.quantity} ${sale.saleType}`,
-        time: getRelativeTime(sale.createdAt),
-        amount: sale.quantity * sale.unitPrice,
-      });
-    }
-
-    // Sort by time and take last 5
-    return activities
-      .sort((a, b) => {
-        const timeA = a.time === "Today" ? 0 : 1;
-        const timeB = b.time === "Today" ? 0 : 1;
-        return timeA - timeB;
-      })
-      .slice(0, 5);
-  };
-
-  const recentActivity = getRecentActivity();
-
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return "Good Morning";
@@ -221,398 +133,318 @@ export default function HomeScreen() {
     return "Good Evening";
   };
 
-  const getFormattedDate = () => {
-    return new Date().toLocaleDateString("en-GB", {
-      weekday: "long",
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-  };
-
   return (
-    <ScrollView
-      style={[tw`flex-1`, { backgroundColor: colors.background }]}
-      contentContainerStyle={tw`p-4`}
-    >
-      {/* Header */}
-      <View style={tw`mb-4`}>
-        <Text style={[tw`text-2xl font-bold`, { color: colors.text }]}>
-          {getGreeting()}
-        </Text>
-        <Text style={[tw`text-base`, { color: colors.textSecondary }]}>
-          {getFormattedDate()}
-        </Text>
-        <Text style={[tw`text-base mt-1`, { color: colors.textSecondary }]}>
-          {settings.farmName || "Your Farm"}
-        </Text>
-      </View>
-
-      {/* Farm Status Bar */}
-      <View
-        style={[
-          tw`rounded-2xl p-4 mb-6 flex-row items-center`,
-          { backgroundColor: colors.surface },
-        ]}
+    <View style={tw`flex-1 pt-5`}>
+      <ScrollView
+        style={[tw`flex-1`, { backgroundColor: colors.background }]}
+        contentContainerStyle={tw`p-4 pb-24`}
       >
-        <Animated.View
-          style={[
-            tw`w-3 h-3 rounded-full mr-3`,
-            {
-              backgroundColor: farmStatus.color,
-              opacity: farmStatus.status === "none" ? 0 : pulseAnim,
-            },
-          ]}
-        />
-        <View style={tw`flex-1`}>
-          <Text
-            style={[tw`text-xs uppercase`, { color: colors.textSecondary }]}
-          >
-            Farm Status
+        {/* Header */}
+        <View style={tw`mb-4`}>
+          <Text style={[tw`text-2xl font-bold`, { color: colors.text }]}>
+            {getGreeting()}
           </Text>
-          <Text style={[tw`text-lg font-bold`, { color: farmStatus.color }]}>
-            {farmStatus.label}
-          </Text>
-        </View>
-      </View>
-
-      {/* Quick Actions */}
-      <Text style={[tw`text-lg font-semibold mb-3`, { color: colors.text }]}>
-        Quick Actions
-      </Text>
-
-      <TouchableOpacity
-        style={[
-          tw`flex-row items-center p-4 rounded-xl mb-3 border`,
-          {
-            backgroundColor: "transparent",
-            borderColor: colors.accent,
-          },
-        ]}
-        onPress={() => router.push("/log")}
-      >
-        <View
-          style={[
-            tw`w-12 h-12 rounded-full items-center justify-center`,
-            { backgroundColor: colors.accent + "20" },
-          ]}
-        >
-          <Ionicons name="add-circle" size={28} color={colors.accent} />
-        </View>
-        <View style={tw`ml-3 flex-1`}>
-          <Text style={[tw`text-lg font-bold`, { color: colors.text }]}>
-            Log Today
-          </Text>
-          <Text style={[tw`text-sm`, { color: colors.textSecondary }]}>
-            Record mortality, feed, eggs
-          </Text>
-        </View>
-        <Ionicons
-          name="chevron-forward"
-          size={24}
-          color={colors.textSecondary}
-        />
-      </TouchableOpacity>
-
-      <View style={tw`flex-row gap-3`}>
-        <TouchableOpacity
-          style={[
-            tw`flex-1 p-4 rounded-xl border`,
-            {
-              backgroundColor: "transparent",
-              borderColor: colors.border,
-            },
-          ]}
-          onPress={() => router.push("/finance")}
-        >
-          <Ionicons name="wallet-outline" size={24} color={colors.primary} />
-          <Text style={[tw`text-sm font-medium mt-2`, { color: colors.text }]}>
-            Add Expense
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            tw`flex-1 p-4 rounded-xl border`,
-            {
-              backgroundColor: "transparent",
-              borderColor: colors.border,
-            },
-          ]}
-          onPress={() => router.push("/finance")}
-        >
-          <Ionicons name="cash-outline" size={24} color={colors.primary} />
-          <Text style={[tw`text-sm font-medium mt-2`, { color: colors.text }]}>
-            Record Sale
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Today's Summary */}
-      <Text
-        style={[tw`text-lg font-semibold mt-6 mb-3`, { color: colors.text }]}
-      >
-        Today
-      </Text>
-      <View
-        style={[tw`rounded-2xl p-4 mb-6`, { backgroundColor: colors.surface }]}
-      >
-        <View style={tw`flex-row justify-between`}>
-          <View style={tw`items-center`}>
-            <Ionicons
-              name="skull"
-              size={20}
-              color={
-                todaySummary.deaths > 0 ? colors.danger : colors.textSecondary
-              }
-            />
-            <Text
-              style={[
-                tw`text-xl font-bold mt-1`,
-                {
-                  color: todaySummary.deaths > 0 ? colors.danger : colors.text,
-                },
-              ]}
-            >
-              {todaySummary.deaths > 0 ? todaySummary.deaths : "—"}
-            </Text>
-            <Text style={[tw`text-xs`, { color: colors.textSecondary }]}>
-              Deaths
-            </Text>
-          </View>
-          <View style={tw`items-center`}>
-            <Ionicons name="leaf" size={20} color={colors.primary} />
-            <Text style={[tw`text-xl font-bold mt-1`, { color: colors.text }]}>
-              {todaySummary.feed > 0 ? `${todaySummary.feed}kg` : "—"}
-            </Text>
-            <Text style={[tw`text-xs`, { color: colors.textSecondary }]}>
-              Feed
-            </Text>
-          </View>
-          <View style={tw`items-center`}>
-            <Ionicons name="egg" size={20} color={colors.accent} />
-            <Text style={[tw`text-xl font-bold mt-1`, { color: colors.text }]}>
-              {todaySummary.eggs > 0 ? todaySummary.eggs : "—"}
-            </Text>
-            <Text style={[tw`text-xs`, { color: colors.textSecondary }]}>
-              Eggs
-            </Text>
-          </View>
-        </View>
-      </View>
-
-      {/* Active Flocks */}
-      <Text style={[tw`text-lg font-semibold mb-3`, { color: colors.text }]}>
-        Active Flocks
-      </Text>
-
-      {activeFlocks.length === 0 ? (
-        <View
-          style={[
-            tw`p-6 rounded-xl items-center`,
-            { backgroundColor: colors.surface },
-          ]}
-        >
-          <Ionicons name="egg-outline" size={48} color={colors.textSecondary} />
           <Text
             style={[
-              tw`text-base mt-3 text-center`,
+              tw`text-base mt-1 font-bold`,
               { color: colors.textSecondary },
             ]}
           >
-            No flocks yet.{"\n"}Add your first flock to get started!
+            {settings.farmName || "Your Farm"}
           </Text>
+        </View>
+
+        {/* Farm Status Bar */}
+        <View
+          style={[
+            tw`rounded-2xl p-4 mb-6 flex-row items-center`,
+            { backgroundColor: colors.surface },
+          ]}
+        >
+          <Animated.View
+            style={[
+              tw`w-3 h-3 rounded-full mr-3`,
+              {
+                backgroundColor: farmStatus.color,
+                opacity: farmStatus.status === "none" ? 0 : pulseAnim,
+              },
+            ]}
+          />
+          <View style={tw`flex-1`}>
+            <Text
+              style={[tw`text-xs uppercase`, { color: colors.textSecondary }]}
+            >
+              Farm Status
+            </Text>
+            <Text style={[tw`text-lg font-bold`, { color: farmStatus.color }]}>
+              {farmStatus.label}
+            </Text>
+          </View>
+        </View>
+
+        {/* Quick Actions */}
+        <Text style={[tw`text-lg font-semibold mb-3`, { color: colors.text }]}>
+          Quick Actions
+        </Text>
+
+        <TouchableOpacity
+          style={[
+            tw`flex-row items-center p-4 rounded-xl mb-3 border`,
+            {
+              backgroundColor: "transparent",
+              borderColor: colors.accent,
+            },
+          ]}
+          onPress={() => router.push("/log")}
+        >
+          <View
+            style={[
+              tw`w-12 h-12 rounded-full items-center justify-center`,
+              { backgroundColor: colors.accent + "20" },
+            ]}
+          >
+            <Ionicons name="add-circle" size={28} color={colors.accent} />
+          </View>
+          <View style={tw`ml-3 flex-1`}>
+            <Text style={[tw`text-lg font-bold`, { color: colors.text }]}>
+              Log Today
+            </Text>
+            <Text style={[tw`text-sm`, { color: colors.textSecondary }]}>
+              Record mortality, feed, eggs
+            </Text>
+          </View>
+          <Ionicons
+            name="chevron-forward"
+            size={24}
+            color={colors.textSecondary}
+          />
+        </TouchableOpacity>
+
+        <View style={tw`flex-row gap-3`}>
           <TouchableOpacity
             style={[
-              tw`mt-4 px-6 py-3 rounded-full`,
-              { backgroundColor: colors.primary },
+              tw`flex-1 p-4 rounded-xl border`,
+              {
+                backgroundColor: "transparent",
+                borderColor: colors.border,
+              },
             ]}
-            onPress={() => router.push("/flocks")}
+            onPress={() => router.push("/finance")}
           >
-            <Text style={[tw`font-semibold`, { color: colors.text }]}>
-              Add Flock
+            <Ionicons name="wallet-outline" size={24} color={colors.primary} />
+            <Text
+              style={[tw`text-sm font-medium mt-2`, { color: colors.text }]}
+            >
+              Add Expense
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              tw`flex-1 p-4 rounded-xl border`,
+              {
+                backgroundColor: "transparent",
+                borderColor: colors.border,
+              },
+            ]}
+            onPress={() => router.push("/finance")}
+          >
+            <Ionicons name="cash-outline" size={24} color={colors.primary} />
+            <Text
+              style={[tw`text-sm font-medium mt-2`, { color: colors.text }]}
+            >
+              Record Sale
             </Text>
           </TouchableOpacity>
         </View>
-      ) : (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={tw`margin-0 -ml-4 pl-4 mb-6`}
+
+        {/* Today's Summary */}
+        <Text
+          style={[tw`text-lg font-semibold mt-6 mb-3`, { color: colors.text }]}
         >
-          {activeFlocks.map((flock) => {
-            const log = getDailyLog(flock.id, today);
-            const daysOld = Math.floor(
-              (Date.now() - new Date(flock.startDate).getTime()) /
-                (1000 * 60 * 60 * 24),
-            );
-            const currentCount = log?.birdCount || flock.initialCount;
-
-            return (
-              <TouchableOpacity
-                key={flock.id}
-                style={[
-                  tw`w-40 p-4 rounded-xl mr-3`,
-                  { backgroundColor: colors.surface },
-                ]}
-                onPress={() => {
-                  if (log) {
-                    router.push(`/flock/${flock.id}`);
-                  } else {
-                    router.push(`/log`);
-                  }
-                }}
-              >
-                <View style={tw`flex-row justify-between items-start`}>
-                  <Ionicons
-                    name={flock.type === "layer" ? "egg" : "restaurant"}
-                    size={24}
-                    color={colors.primary}
-                  />
-                  <View
-                    style={[
-                      tw`px-2 py-1 rounded-full`,
-                      {
-                        backgroundColor: log
-                          ? colors.primary + "30"
-                          : colors.accent + "30",
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        tw`text-xs`,
-                        { color: log ? colors.primary : colors.accent },
-                      ]}
-                    >
-                      {log ? "✓ Logged" : "⏰ Log"}
-                    </Text>
-                  </View>
-                </View>
-                <Text
-                  style={[tw`text-base font-bold mt-3`, { color: colors.text }]}
-                  numberOfLines={1}
-                >
-                  {flock.name}
-                </Text>
-                <Text style={[tw`text-sm`, { color: colors.textSecondary }]}>
-                  {currentCount} birds • Day {daysOld}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-
-          {/* Add Flock Card */}
-          {flocksCount < 5 && (
-            <TouchableOpacity
-              style={[
-                tw`w-40 p-4 rounded-xl border-2 border-dashed items-center justify-center`,
-                {
-                  borderColor: colors.divider,
-                },
-              ]}
-              onPress={() => router.push("/flocks")}
-            >
-              <Ionicons
-                name="add-circle-outline"
-                size={32}
-                color={colors.textSecondary}
-              />
-              <Text style={[tw`text-sm mt-2`, { color: colors.textSecondary }]}>
-                Add Flock
-              </Text>
-            </TouchableOpacity>
-          )}
-        </ScrollView>
-      )}
-
-      {/* Recent Activity */}
-      <Text style={[tw`text-lg font-semibold mb-3`, { color: colors.text }]}>
-        Recent Activity
-      </Text>
-      {recentActivity.length > 0 ? (
+          Today
+        </Text>
         <View
           style={[
             tw`rounded-2xl p-4 mb-6`,
             { backgroundColor: colors.surface },
           ]}
         >
-          {recentActivity.map((activity, index) => (
-            <View key={activity.id}>
-              <View style={tw`flex-row items-center py-3`}>
-                <Ionicons
-                  name={activity.icon as any}
-                  size={20}
-                  color={
-                    activity.type === "log"
-                      ? colors.primary
-                      : activity.type === "expense"
-                        ? colors.danger
-                        : colors.accent
-                  }
-                />
-                <View style={tw`ml-3 flex-1`}>
-                  <Text style={[tw`text-sm`, { color: colors.text }]}>
-                    {activity.description}
-                  </Text>
-                  <Text style={[tw`text-xs`, { color: colors.textSecondary }]}>
-                    {activity.time}
-                    {activity.amount
-                      ? ` • ${settings.currencySymbol}${activity.amount.toLocaleString()}`
-                      : ""}
-                  </Text>
-                </View>
-              </View>
-              {index < recentActivity.length - 1 && (
-                <View style={[tw`h-px`, { backgroundColor: colors.divider }]} />
-              )}
+          <View style={tw`flex-row justify-around`}>
+            <View style={tw`items-center`}>
+              <Ionicons
+                name="skull"
+                size={20}
+                color={
+                  todaySummary.deaths > 0 ? colors.danger : colors.textSecondary
+                }
+              />
+              <Text
+                style={[
+                  tw`text-xl font-bold mt-1`,
+                  {
+                    color:
+                      todaySummary.deaths > 0 ? colors.danger : colors.text,
+                  },
+                ]}
+              >
+                {todaySummary.deaths > 0 ? todaySummary.deaths : "—"}
+              </Text>
+              <Text style={[tw`text-xs`, { color: colors.textSecondary }]}>
+                Deaths
+              </Text>
             </View>
-          ))}
+            <View style={tw`items-center`}>
+              <Ionicons name="leaf" size={20} color={colors.primary} />
+              <Text
+                style={[tw`text-xl font-bold mt-1`, { color: colors.text }]}
+              >
+                {todaySummary.feed > 0 ? `${todaySummary.feed}kg` : "—"}
+              </Text>
+              <Text style={[tw`text-xs`, { color: colors.textSecondary }]}>
+                Feed
+              </Text>
+            </View>
+            <View style={tw`items-center`}>
+              <Ionicons name="egg" size={20} color={colors.accent} />
+              <Text
+                style={[tw`text-xl font-bold mt-1`, { color: colors.text }]}
+              >
+                {todaySummary.eggs > 0 ? todaySummary.eggs : "—"}
+              </Text>
+              <Text style={[tw`text-xs`, { color: colors.textSecondary }]}>
+                Eggs
+              </Text>
+            </View>
+          </View>
         </View>
-      ) : (
-        <View
-          style={[
-            tw`rounded-2xl p-4 mb-6 items-center`,
-            { backgroundColor: colors.surface },
-          ]}
-        >
-          <Text style={[tw`text-sm`, { color: colors.textSecondary }]}>
-            No recent activity. Start by logging today!
-          </Text>
-        </View>
-      )}
 
-      {/* Premium Banner (if not premium) */}
-      {!premium.isPremium && (
-        <View
-          style={[
-            tw`mt-6 p-4 rounded-xl`,
-            { backgroundColor: colors.surfaceElevated },
-          ]}
-        >
-          <View style={tw`flex-row items-center`}>
-            <View style={tw`flex-1`}>
-              <Text style={[tw`font-bold`, { color: colors.text }]}>
-                Upgrade to Premium
-              </Text>
-              <Text style={[tw`text-sm mt-1`, { color: colors.textSecondary }]}>
-                Unlimited flocks & CSV export
-              </Text>
-            </View>
+        {/* Active Flocks */}
+        <Text style={[tw`text-lg font-semibold mb-3`, { color: colors.text }]}>
+          Active Flocks
+        </Text>
+
+        {activeFlocks.length === 0 ? (
+          <View
+            style={[
+              tw`p-6 rounded-xl items-center`,
+              { backgroundColor: colors.surface },
+            ]}
+          >
+            <Ionicons
+              name="egg-outline"
+              size={48}
+              color={colors.textSecondary}
+            />
+            <Text
+              style={[
+                tw`text-base mt-3 text-center`,
+                { color: colors.textSecondary },
+              ]}
+            >
+              No flocks yet.{"\n"}Add your first flock to get started!
+            </Text>
             <TouchableOpacity
               style={[
-                tw`px-4 py-2 rounded-full`,
-                { backgroundColor: colors.accent },
+                tw`mt-4 px-6 py-3 rounded-full`,
+                { backgroundColor: colors.primary },
               ]}
-              onPress={() => router.push("/more")}
+              onPress={() => router.push("/flocks")}
             >
-              <Text style={[tw`font-semibold text-sm`, { color: colors.text }]}>
-                $9.99
+              <Text style={[tw`font-semibold`, { color: colors.text }]}>
+                Add Flock
               </Text>
             </TouchableOpacity>
           </View>
-        </View>
-      )}
-    </ScrollView>
+        ) : (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={tw`margin-0 -ml-4 pl-4 mb-6`}
+          >
+            {activeFlocks.map((flock) => {
+              const log = getDailyLog(flock.id, today);
+              const daysOld = Math.floor(
+                (Date.now() - new Date(flock.startDate).getTime()) /
+                  (1000 * 60 * 60 * 24),
+              );
+              const currentCount = log?.birdCount || flock.initialCount;
+
+              return (
+                <TouchableOpacity
+                  key={flock.id}
+                  style={[
+                    tw`w-40 p-4 rounded-xl mr-3`,
+                    { backgroundColor: colors.surface },
+                  ]}
+                  onPress={() => {
+                    if (log) {
+                      router.push(`/flock/${flock.id}`);
+                    } else {
+                      router.push(`/log`);
+                    }
+                  }}
+                >
+                  <View style={tw`flex-row justify-between items-start`}>
+                    <Ionicons
+                      name={flock.type === "layer" ? "egg" : "restaurant"}
+                      size={24}
+                      color={colors.primary}
+                    />
+                  </View>
+                  <Text
+                    style={[
+                      tw`text-base font-bold mt-3`,
+                      { color: colors.text },
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {flock.name}
+                  </Text>
+                  <Text style={[tw`text-sm`, { color: colors.textSecondary }]}>
+                    {currentCount} birds • Day {daysOld}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+
+            {/* Add Flock Card */}
+            {flocksCount < 5 && (
+              <TouchableOpacity
+                style={[
+                  tw`w-40 p-4 rounded-xl border-2 border-dashed items-center justify-center`,
+                  {
+                    borderColor: colors.divider,
+                  },
+                ]}
+                onPress={() => router.push("/flocks")}
+              >
+                <Ionicons
+                  name="add-circle-outline"
+                  size={32}
+                  color={colors.textSecondary}
+                />
+                <Text
+                  style={[tw`text-sm mt-2`, { color: colors.textSecondary }]}
+                >
+                  Add Flock
+                </Text>
+              </TouchableOpacity>
+            )}
+          </ScrollView>
+        )}
+      </ScrollView>
+
+      {/* FAB - Log Today */}
+      <TouchableOpacity
+        style={[
+          tw`absolute bottom-6 right-6 w-16 h-16 rounded-full items-center justify-center`,
+          { backgroundColor: colors.accent },
+        ]}
+        onPress={() => router.push("/log")}
+      >
+        <Ionicons name="add" size={32} color={colors.text} />
+      </TouchableOpacity>
+    </View>
   );
 }

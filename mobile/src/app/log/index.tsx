@@ -207,26 +207,14 @@ export default function LogScreen() {
     // Success haptic
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
-    Alert.alert("✅ Log Saved!", `${selectedFlock?.name} has been logged.`, [
+    Alert.alert("Log Saved", `${selectedFlock?.name} has been logged.`, [
       { text: "OK", onPress: () => router.back() },
     ]);
   };
 
   if (!selectedFlockId) {
     return (
-      <View style={[tw`flex-1`, { backgroundColor: colors.background }]}>
-        <View style={[tw`p-4 border-b`, { borderColor: colors.divider }]}>
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={tw`flex-row items-center`}
-          >
-            <Ionicons name="arrow-back" size={24} color={colors.text} />
-            <Text style={[tw`ml-2 text-lg font-bold`, { color: colors.text }]}>
-              Select Flock
-            </Text>
-          </TouchableOpacity>
-        </View>
-
+      <View style={tw`flex-1`}>
         <ScrollView contentContainerStyle={tw`p-4`}>
           <Text style={[tw`text-sm mb-4`, { color: colors.textSecondary }]}>
             Which flock are you logging today?
@@ -299,15 +287,10 @@ export default function LogScreen() {
 
   return (
     <View style={[tw`flex-1`, { backgroundColor: colors.background }]}>
-      <View style={[tw`p-4 border-b`, { borderColor: colors.divider }]}>
-        <View style={tw`flex-row items-center justify-between`}>
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={tw`flex-row items-center`}
-          >
-            <Ionicons name="close" size={24} color={colors.text} />
-          </TouchableOpacity>
-          <View style={tw`flex-1 items-center`}>
+      {/* Custom header area with progress - below native header */}
+      <View style={tw`p-4 border-b`}>
+        <View style={tw`flex-row items-center justify-between mb-4`}>
+          <View style={tw`flex-1`}>
             <Text style={[tw`font-bold`, { color: colors.text }]}>
               {selectedFlock?.name} • {selectedFlock?.type}
             </Text>
@@ -315,12 +298,9 @@ export default function LogScreen() {
               Day {daysOld} of cycle
             </Text>
           </View>
-          <View style={tw`w-8`} />
         </View>
 
-        <View style={tw`mt-4`}>
-          <Progress totalSteps={steps.length} currentStep={currentStep} />
-        </View>
+        <Progress totalSteps={steps.length} currentStep={currentStep} />
       </View>
 
       <ScrollView
@@ -351,7 +331,7 @@ export default function LogScreen() {
           <View style={tw`flex-row items-center gap-4 mb-6`}>
             <TouchableOpacity
               style={[
-                tw`w-20 h-20 rounded-2xl items-center justify-center`,
+                tw`w-16 h-16 rounded-xl items-center justify-center`,
                 { backgroundColor: colors.surface },
               ]}
               onPress={() => {
@@ -362,19 +342,24 @@ export default function LogScreen() {
                 });
               }}
             >
-              <Ionicons name="remove" size={32} color={colors.text} />
+              <Ionicons name="remove" size={24} color={colors.text} />
             </TouchableOpacity>
-            <Text
+            <TextInput
               style={[
-                tw`text-6xl font-bold w-32 text-center`,
+                tw`text-5xl font-bold w-24 text-center bg-transparent`,
                 { color: colors.text },
               ]}
-            >
-              {formData.deaths}
-            </Text>
+              value={formData.deaths.toString()}
+              keyboardType="number-pad"
+              onChangeText={(text) => {
+                const num = parseInt(text) || 0;
+                setFormData({ ...formData, deaths: Math.max(0, num) });
+              }}
+              selectTextOnFocus
+            />
             <TouchableOpacity
               style={[
-                tw`w-20 h-20 rounded-2xl items-center justify-center`,
+                tw`w-16 h-16 rounded-xl items-center justify-center`,
                 { backgroundColor: colors.surface },
               ]}
               onPress={() => {
@@ -382,7 +367,7 @@ export default function LogScreen() {
                 setFormData({ ...formData, deaths: formData.deaths + 1 });
               }}
             >
-              <Ionicons name="add" size={32} color={colors.text} />
+              <Ionicons name="add" size={24} color={colors.text} />
             </TouchableOpacity>
           </View>
 
@@ -477,7 +462,7 @@ export default function LogScreen() {
             <View style={tw`flex-row items-center gap-4 mb-4`}>
               <TouchableOpacity
                 style={[
-                  tw`w-20 h-20 rounded-2xl items-center justify-center`,
+                  tw`w-16 h-16 rounded-xl items-center justify-center`,
                   { backgroundColor: colors.surface },
                 ]}
                 onPress={() =>
@@ -487,19 +472,24 @@ export default function LogScreen() {
                   })
                 }
               >
-                <Ionicons name="remove" size={32} color={colors.text} />
+                <Ionicons name="remove" size={24} color={colors.text} />
               </TouchableOpacity>
-              <Text
+              <TextInput
                 style={[
-                  tw`text-6xl font-bold w-32 text-center`,
+                  tw`text-5xl font-bold w-24 text-center bg-transparent`,
                   { color: colors.text },
                 ]}
-              >
-                {formData.eggsCollected}
-              </Text>
+                value={formData.eggsCollected.toString()}
+                keyboardType="number-pad"
+                onChangeText={(text) => {
+                  const num = parseInt(text) || 0;
+                  setFormData({ ...formData, eggsCollected: Math.max(0, num) });
+                }}
+                selectTextOnFocus
+              />
               <TouchableOpacity
                 style={[
-                  tw`w-20 h-20 rounded-2xl items-center justify-center`,
+                  tw`w-16 h-16 rounded-xl items-center justify-center`,
                   { backgroundColor: colors.surface },
                 ]}
                 onPress={() =>
@@ -509,7 +499,7 @@ export default function LogScreen() {
                   })
                 }
               >
-                <Ionicons name="add" size={32} color={colors.text} />
+                <Ionicons name="add" size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
 
@@ -612,7 +602,7 @@ export default function LogScreen() {
           <View style={tw`flex-row items-center gap-4 mb-4`}>
             <TouchableOpacity
               style={[
-                tw`w-20 h-20 rounded-2xl items-center justify-center`,
+                tw`w-16 h-16 rounded-xl items-center justify-center`,
                 { backgroundColor: colors.surface },
               ]}
               onPress={() =>
@@ -622,26 +612,31 @@ export default function LogScreen() {
                 })
               }
             >
-              <Ionicons name="remove" size={32} color={colors.text} />
+              <Ionicons name="remove" size={24} color={colors.text} />
             </TouchableOpacity>
-            <Text
+            <TextInput
               style={[
-                tw`text-6xl font-bold w-40 text-center`,
+                tw`text-5xl font-bold w-32 text-center bg-transparent`,
                 { color: colors.text },
               ]}
-            >
-              {reactiveBirdCount}
-            </Text>
+              value={formData.birdCount.toString()}
+              keyboardType="number-pad"
+              onChangeText={(text) => {
+                const num = parseInt(text) || 0;
+                setFormData({ ...formData, birdCount: Math.max(0, num) });
+              }}
+              selectTextOnFocus
+            />
             <TouchableOpacity
               style={[
-                tw`w-20 h-20 rounded-2xl items-center justify-center`,
+                tw`w-16 h-16 rounded-xl items-center justify-center`,
                 { backgroundColor: colors.surface },
               ]}
               onPress={() =>
                 setFormData({ ...formData, birdCount: formData.birdCount + 10 })
               }
             >
-              <Ionicons name="add" size={32} color={colors.text} />
+              <Ionicons name="add" size={24} color={colors.text} />
             </TouchableOpacity>
           </View>
 
@@ -799,7 +794,7 @@ export default function LogScreen() {
               onPress={handleSave}
             >
               <Text style={[tw`font-bold`, { color: colors.text }]}>
-                💾 Save Log
+                Save Log
               </Text>
             </TouchableOpacity>
           )}
